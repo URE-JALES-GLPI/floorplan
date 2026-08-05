@@ -1,0 +1,257 @@
+/**
+ * floorplan.css — Plugin FloorPlan GLPI
+ */
+
+/* ─── Variáveis ──────────────────────────────────────────────────── */
+:root {
+  --fp-bg          : #1a1d23;
+  --fp-surface     : #23272f;
+  --fp-border      : #353a45;
+  --fp-accent      : #3b82f6;
+  --fp-accent-dark : #2563eb;
+  --fp-text        : #e2e8f0;
+  --fp-muted       : #8892a4;
+  --fp-success     : #22c55e;
+  --fp-danger      : #ef4444;
+  --fp-pin-bg      : #3b82f6;
+  --fp-pin-shadow  : 0 2px 8px rgba(59,130,246,.45);
+  --fp-radius      : 6px;
+}
+
+/* ─── Card grid (lista por entidade) ────────────────────────────── */
+.fp-toolbar { margin-bottom: 16px; }
+.fp-btn-new {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px; background: var(--fp-accent); color: #fff;
+  border-radius: var(--fp-radius); text-decoration: none;
+  font-size: .875rem; transition: background .15s;
+}
+.fp-btn-new:hover { background: var(--fp-accent-dark); color: #fff; }
+.fp-empty { color: var(--fp-muted); font-style: italic; padding: 24px 0; }
+.fp-card-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(240px,1fr));
+  gap: 16px; margin-top: 8px;
+}
+.fp-card {
+  background: var(--fp-surface); border: 1px solid var(--fp-border);
+  border-radius: var(--fp-radius); overflow: hidden; transition: transform .15s, box-shadow .15s;
+}
+.fp-card:hover { transform: translateY(-2px); box-shadow: 0 4px 16px rgba(0,0,0,.3); }
+.fp-card-thumb { height: 140px; overflow: hidden; background: #11141a; display: flex; align-items: center; justify-content: center; }
+.fp-card-thumb img { width: 100%; height: 100%; object-fit: cover; opacity: .85; }
+.fp-card-info { padding: 12px; }
+.fp-card-info h3 { margin: 0 0 4px; font-size: .95rem; color: var(--fp-text); }
+.fp-card-info p { font-size: .8rem; color: var(--fp-muted); margin: 0 0 10px; }
+
+/* ─── Mapa: layout principal ─────────────────────────────────────── */
+.fp-map-section {
+  margin-top: 24px; background: var(--fp-bg);
+  border: 1px solid var(--fp-border); border-radius: 8px; overflow: hidden;
+}
+.fp-map-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 12px 16px; background: var(--fp-surface); border-bottom: 1px solid var(--fp-border);
+}
+.fp-map-header h2 { margin: 0; font-size: 1rem; color: var(--fp-text); display: flex; align-items: center; gap: 8px; }
+.fp-map-header h2 i { color: var(--fp-accent); }
+.fp-map-controls { display: flex; gap: 6px; }
+.fp-btn {
+  width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  background: var(--fp-bg); border: 1px solid var(--fp-border); border-radius: var(--fp-radius);
+  color: var(--fp-text); cursor: pointer; font-size: .8rem; transition: background .15s, color .15s;
+}
+.fp-btn:hover { background: var(--fp-accent); border-color: var(--fp-accent); }
+
+/* ─── Layout mapa ────────────────────────────────────────────────── */
+.fp-map-layout { display: flex; height: 650px; }
+
+/* ─── Área de mapa ───────────────────────────────────────────────── */
+.fp-map-container {
+  flex: 1; overflow: auto; position: relative; background: #0d1117;
+  background-image: radial-gradient(circle at 1px 1px, rgba(255,255,255,.03) 1px, transparent 0);
+  background-size: 24px 24px; cursor: crosshair;
+}
+.fp-map-canvas {
+  position: relative; display: inline-block;
+  min-width: 100%; min-height: 100%; transform-origin: top left; transition: transform .15s ease;
+}
+.fp-map-canvas img, .fp-map-canvas canvas {
+  display: block; max-width: 100%; max-height: 590px; user-select: none;
+}
+
+/* ─── Dica de clique ─────────────────────────────────────────────── */
+.fp-click-hint {
+  position: absolute; bottom: 12px; left: 50%; transform: translateX(-50%);
+  background: rgba(0,0,0,.7); color: #94a3b8; font-size: .75rem;
+  padding: 5px 12px; border-radius: 20px; pointer-events: none;
+  display: flex; align-items: center; gap: 6px; white-space: nowrap;
+}
+
+/* ─── Pins ───────────────────────────────────────────────────────── */
+#fp-pins-layer { position: absolute; inset: 0; pointer-events: none; }
+.fp-pin {
+  position: absolute; transform: translate(-50%, -100%);
+  pointer-events: all; cursor: pointer; z-index: 10;
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+}
+.fp-pin-icon {
+  width: 36px; height: 36px; background: var(--fp-pin-bg);
+  border: 2px solid rgba(255,255,255,.3); border-radius: 50% 50% 50% 0;
+  transform: rotate(-45deg); display: flex; align-items: center; justify-content: center;
+  box-shadow: var(--fp-pin-shadow); transition: transform .15s, background .15s;
+}
+.fp-pin-icon svg { transform: rotate(45deg); color: #fff; width: 18px; height: 18px; stroke: #fff; }
+.fp-pin-label {
+  font-size: .7rem; background: rgba(0,0,0,.75); color: #fff;
+  padding: 2px 6px; border-radius: 3px; white-space: nowrap;
+  max-width: 120px; overflow: hidden; text-overflow: ellipsis;
+  opacity: 0; transform: translateY(4px); transition: opacity .15s, transform .15s;
+}
+.fp-pin--hover .fp-pin-label, .fp-pin:hover .fp-pin-label { opacity: 1; transform: translateY(0); }
+.fp-pin--hover .fp-pin-icon, .fp-pin:hover .fp-pin-icon { background: var(--fp-accent-dark); transform: rotate(-45deg) scale(1.15); }
+.fp-pin--dragging .fp-pin-icon { background: #f59e0b; box-shadow: 0 4px 16px rgba(245,158,11,.5); }
+.fp-pin-remove {
+  position: absolute; top: -6px; right: -6px; width: 16px; height: 16px;
+  background: var(--fp-danger); color: #fff; border: none; border-radius: 50%;
+  font-size: .7rem; line-height: 1; cursor: pointer; display: none;
+  align-items: center; justify-content: center; z-index: 2;
+}
+.fp-pin:hover .fp-pin-remove { display: flex; }
+
+/* ─── Footer de salvar ───────────────────────────────────────────── */
+.fp-map-footer {
+  display: flex; align-items: center; gap: 12px;
+  padding: 10px 16px; background: var(--fp-surface); border-top: 1px solid var(--fp-border);
+}
+.fp-save-status { font-size: .85rem; }
+.fp-save-status--loading { color: var(--fp-muted); }
+.fp-save-status--ok      { color: var(--fp-success); }
+.fp-save-status--error   { color: var(--fp-danger); }
+
+/* ─── Scrollbar ──────────────────────────────────────────────────── */
+.fp-map-container::-webkit-scrollbar { width: 6px; height: 6px; }
+.fp-map-container::-webkit-scrollbar-track { background: transparent; }
+.fp-map-container::-webkit-scrollbar-thumb { background: var(--fp-border); border-radius: 3px; }
+
+/* ─── Popup de seleção de ativo ──────────────────────────────────── */
+.fp-popup {
+  position: fixed; z-index: 9999; width: 300px; max-height: 440px;
+  background: #1e2330; border: 1px solid #3b4460; border-radius: 10px;
+  box-shadow: 0 8px 32px rgba(0,0,0,.6); overflow: hidden;
+  display: none; flex-direction: column;
+}
+.fp-popup.fp-popup--open { display: flex; }
+
+.fp-popup-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 10px 14px; background: #252b3b; border-bottom: 1px solid #3b4460;
+  font-size: .875rem; font-weight: 600; color: #e2e8f0; flex-shrink: 0;
+}
+.fp-popup-header i { color: #3b82f6; margin-right: 6px; }
+.fp-popup-close {
+  background: none; border: none; color: #8892a4; font-size: 1.3rem;
+  cursor: pointer; line-height: 1; padding: 0 2px; transition: color .15s;
+}
+.fp-popup-close:hover { color: #ef4444; }
+
+.fp-popup-body {
+  overflow-y: auto; flex: 1; padding: 4px 0;
+  scrollbar-width: thin; scrollbar-color: #3b4460 transparent;
+}
+
+.fp-popup-cat-btn {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 11px 14px; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,.04);
+  color: #e2e8f0; font-size: .875rem; cursor: pointer; text-align: left; transition: background .12s;
+}
+.fp-popup-cat-btn:hover { background: rgba(59,130,246,.12); }
+.fp-popup-cat-btn i:first-child { color: #3b82f6; width: 18px; text-align: center; flex-shrink: 0; }
+.fp-popup-cat-btn > span:first-of-type { flex: 1; }
+.fp-popup-count { font-size: .7rem; background: #3b4460; padding: 2px 8px; border-radius: 20px; color: #94a3b8; }
+.fp-popup-arrow { color: #4b5563 !important; font-size: .8rem; }
+
+.fp-popup-back {
+  display: flex; align-items: center; gap: 6px; width: 100%;
+  padding: 8px 14px; background: none; border: none; border-bottom: 1px solid #3b4460;
+  color: #3b82f6; font-size: .8rem; cursor: pointer; transition: background .12s;
+}
+.fp-popup-back:hover { background: rgba(59,130,246,.08); }
+
+.fp-popup-search {
+  display: block; width: calc(100% - 28px); margin: 8px 14px;
+  padding: 6px 10px; background: #0d1117; border: 1px solid #3b4460;
+  border-radius: 6px; color: #e2e8f0; font-size: .82rem; outline: none;
+}
+.fp-popup-search:focus { border-color: #3b82f6; }
+
+.fp-popup-asset-btn {
+  display: flex; align-items: center; gap: 8px; width: 100%;
+  padding: 9px 14px; background: none; border: none; border-bottom: 1px solid rgba(255,255,255,.03);
+  color: #e2e8f0; font-size: .82rem; cursor: pointer; text-align: left; transition: background .12s;
+}
+.fp-popup-asset-btn:hover { background: rgba(59,130,246,.15); }
+.fp-popup-asset-btn i { color: #3b82f6; width: 16px; text-align: center; flex-shrink: 0; }
+.fp-popup-asset-btn > span { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fp-popup-asset-placed { opacity: .5; }
+.fp-badge-placed { font-size: .65rem; padding: 1px 6px; background: #3b82f6; color: #fff; border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+.fp-popup-empty { color: #8892a4; font-size: .8rem; padding: 20px 14px; text-align: center; }
+
+/* ─── Responsive ─────────────────────────────────────────────────── */
+@media (max-width: 768px) {
+  .fp-map-layout { flex-direction: column; height: auto; }
+  .fp-map-container { height: 400px; }
+}
+
+/* ─── Ícones SVG no popup e pins ─────────────────────────────────── */
+.fp-cat-icon { width: 20px; height: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.fp-cat-icon svg { width: 20px; height: 20px; stroke: #3b82f6; }
+.fp-cat-icon-sm { width: 16px; height: 16px; display: inline-flex; align-items: center; vertical-align: middle; margin-right: 4px; }
+.fp-cat-icon-sm svg { width: 16px; height: 16px; stroke: #3b82f6; }
+.fp-asset-icon-sm { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.fp-asset-icon-sm svg { width: 16px; height: 16px; stroke: #3b82f6; }
+
+/* ─── Tooltip ───────────────────────────────────────────────────── */
+.fp-tooltip {
+  position     : fixed;
+  z-index      : 99999;
+  background   : #1e2330;
+  border       : 1px solid #3b4460;
+  border-radius: 8px;
+  padding      : 10px 14px;
+  min-width    : 200px;
+  max-width    : 280px;
+  box-shadow   : 0 8px 24px rgba(0,0,0,.55);
+  pointer-events: none;
+  font-size    : .82rem;
+  color        : #e2e8f0;
+}
+.fp-tt-title {
+  font-weight  : 700;
+  font-size    : .9rem;
+  margin-bottom: 8px;
+  color        : #fff;
+  border-bottom: 1px solid #3b4460;
+  padding-bottom: 6px;
+}
+.fp-tt-row {
+  display      : flex;
+  align-items  : center;
+  gap          : 7px;
+  padding      : 2px 0;
+  color        : #94a3b8;
+}
+.fp-tt-row i { color: #3b82f6; width: 14px; text-align: center; flex-shrink: 0; }
+.fp-tt-link  { margin-top: 8px; border-top: 1px solid #3b4460; padding-top: 6px; }
+.fp-tt-link a { color: #3b82f6; text-decoration: none; font-size: .8rem; display: flex; align-items: center; gap: 5px; }
+.fp-tt-link a:hover { color: #60a5fa; }
+
+/* ─── Pin highlight (ao clicar na legenda) ───────────────────────── */
+@keyframes fp-highlight {
+  0%   { box-shadow: 0 0 0 0 rgba(251,191,36,.8); }
+  70%  { box-shadow: 0 0 0 12px rgba(251,191,36,0); }
+  100% { box-shadow: 0 0 0 0 rgba(251,191,36,0); }
+}
+.fp-pin--highlight .fp-pin-icon {
+  background: #f59e0b !important;
+  animation : fp-highlight 1s ease-out 3;
+}
