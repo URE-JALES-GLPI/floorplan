@@ -20,7 +20,7 @@ function plugin_init_floorplan() {
 
 function plugin_version_floorplan() {
     return [
-        'name'         => 'FloorPlan',
+        'name'         => '[URE] FloorPlan',
         'version'      => PLUGIN_FLOORPLAN_VERSION,
         'author'       => 'Você',
         'license'      => 'GPLv2+',
