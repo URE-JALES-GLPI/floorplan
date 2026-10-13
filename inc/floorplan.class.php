@@ -8,9 +8,11 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access this file directly");
 }
 
+require_once __DIR__ . '/compat.php';
+
 class PluginFloorplanFloorplan extends CommonDBTM {
 
-    static $rightname = 'entity';
+    static string $rightname = 'entity';
 
     // ----------------------------------------------------------------
     // Metadados
@@ -136,7 +138,7 @@ class PluginFloorplanFloorplan extends CommonDBTM {
         // Botão de nova planta
         if ($canedit) {
             echo "<div class='fp-toolbar'>";
-            echo "<a href='" . Plugin::getWebDir('floorplan') . "/front/floorplan.form.php?entities_id={$entity_id}'
+            echo "<a href='" . fp_web_dir('floorplan') . "/front/floorplan.form.php?entities_id={$entity_id}'
                      class='btn btn-primary fp-btn-new'>
                      <i class='fas fa-plus'></i> " . __('Nova Planta', 'floorplan') . "
                   </a>";
@@ -156,7 +158,7 @@ class PluginFloorplanFloorplan extends CommonDBTM {
         } else {
             echo "<div class='fp-card-grid'>";
             foreach ($iterator as $row) {
-                $edit_url = Plugin::getWebDir('floorplan') . "/front/floorplan.form.php?id={$row['id']}";
+                $edit_url = fp_web_dir('floorplan') . "/front/floorplan.form.php?id={$row['id']}";
                 echo "
                 <div class='fp-card'>
                     <div class='fp-card-thumb'>
@@ -186,10 +188,10 @@ class PluginFloorplanFloorplan extends CommonDBTM {
 
     static function getImageUrl(?string $filename, ?string $type): string {
         if (empty($filename)) {
-            return Plugin::getWebDir('floorplan') . '/css/no-image.svg';
+            return fp_web_dir('floorplan') . '/css/no-image.svg';
         }
         // Serve via front/image.php para controle de acesso
-        return Plugin::getWebDir('floorplan') . '/front/image.php?file=' . urlencode($filename);
+        return fp_web_dir('floorplan') . '/front/image.php?file=' . urlencode($filename);
     }
 
     // ----------------------------------------------------------------
@@ -252,7 +254,7 @@ class PluginFloorplanFloorplan extends CommonDBTM {
         $fp_id     = $this->getID();
         $img_url   = self::getImageUrl($this->fields['image_path'], $this->fields['image_type']);
         $is_pdf    = ($this->fields['image_type'] === 'pdf');
-        $ajax_url  = Plugin::getWebDir('floorplan') . '/front/ajax.php';
+        $ajax_url  = fp_web_dir('floorplan') . '/front/ajax.php';
 
         // Tipos de ativo: pega do CFG_GLPI e filtra pelo perfil ativo
         global $CFG_GLPI;

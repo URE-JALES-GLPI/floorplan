@@ -4,17 +4,18 @@
  */
 
 include('../../../inc/includes.php');
+require_once __DIR__ . '/../inc/compat.php';
 
 Session::checkRight('plugin_floorplan', READ);
 
 $id = (int)($_GET['id'] ?? 0);
 if (!$id) {
-    Html::redirect(Plugin::getWebDir('floorplan') . '/front/floorplan.php');
+    Html::redirect(fp_web_dir('floorplan') . '/front/floorplan.php');
 }
 
 $fp = new PluginFloorplanFloorplan();
 if (!$fp->getFromDB($id)) {
-    Html::redirect(Plugin::getWebDir('floorplan') . '/front/floorplan.php');
+    Html::redirect(fp_web_dir('floorplan') . '/front/floorplan.php');
 }
 
 global $CFG_GLPI;
@@ -26,7 +27,7 @@ Html::header(
     'PluginFloorplanFloorplan'
 );
 
-$img_url = Plugin::getWebDir('floorplan') . '/front/image.php?file=' . urlencode($fp->fields['image_path'] ?? '');
+$img_url = fp_web_dir('floorplan') . '/front/image.php?file=' . urlencode($fp->fields['image_path'] ?? '');
 ?>
 <div class="container-fluid mt-3 mb-5">
     <div class="d-flex align-items-center gap-3 mb-3">
@@ -87,7 +88,7 @@ $img_url = Plugin::getWebDir('floorplan') . '/front/image.php?file=' . urlencode
 <script>
 window.FP_CONFIG = {
     floorplan_id : <?= $id ?>,
-    ajax_url     : "<?= Plugin::getWebDir('floorplan') ?>/front/ajax.php",
+    ajax_url     : "<?= fp_web_dir('floorplan') ?>/front/ajax.php",
     saved        : <?= json_encode([], JSON_HEX_TAG) ?>,
     available    : <?= json_encode([], JSON_HEX_TAG) ?>,
     itemtypes    : {},

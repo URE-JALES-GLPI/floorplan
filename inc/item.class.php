@@ -10,7 +10,7 @@ if (!defined('GLPI_ROOT')) {
 
 class PluginFloorplanItem extends CommonDBTM {
 
-    static $rightname = 'entity';
+    static string $rightname = 'entity';
 
     static function getTypeName($nb = 0) {
         return _n('Item do Mapa', 'Itens do Mapa', $nb, 'floorplan');

@@ -1,11 +1,18 @@
 <?php
-define('PLUGIN_FLOORPLAN_VERSION', '1.1.1');
+require_once __DIR__ . '/inc/compat.php';
+
+define('PLUGIN_FLOORPLAN_VERSION', '1.2.0');
 define('PLUGIN_FLOORPLAN_MIN_GLPI', '11.0.0');
+define('PLUGIN_FLOORPLAN_MAX_GLPI', '12.0.99');
 
 function plugin_init_floorplan() {
     global $PLUGIN_HOOKS, $CFG_GLPI;
 
-    $PLUGIN_HOOKS['csrf_compliant']['floorplan'] = true;
+    // CSRF compliance - no GLPI 12 o hook foi removido (CheckCsrfListener cuida);
+    // mantém true apenas no GLPI <12 (mesmo esquema do kanpro/protocolo).
+    if (!fp_is_glpi12_plus()) {
+        $PLUGIN_HOOKS['csrf_compliant']['floorplan'] = true;
+    }
 
     Plugin::registerClass('PluginFloorplanProfile', ['addtabon' => 'Profile']);
 
@@ -25,7 +32,7 @@ function plugin_version_floorplan() {
         'author'       => 'Você',
         'license'      => 'GPLv2+',
         'homepage'     => '',
-        'requirements' => ['glpi' => ['min' => PLUGIN_FLOORPLAN_MIN_GLPI]],
+        'requirements' => ['glpi' => ['min' => PLUGIN_FLOORPLAN_MIN_GLPI, 'max' => PLUGIN_FLOORPLAN_MAX_GLPI]],
     ];
 }
 

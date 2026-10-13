@@ -4,6 +4,7 @@
  */
 
 include('../../../inc/includes.php');
+require_once __DIR__ . '/../inc/compat.php';
 
 Session::checkRight('plugin_floorplan', READ);
 
@@ -43,7 +44,7 @@ if (count($iterator) === 0) {
     echo "<div class='row row-cols-1 row-cols-md-3 g-3'>";
     foreach ($iterator as $row) {
         $edit_url = 'floorplan.form.php?id=' . (int)$row['id'];
-        $img_url  = Plugin::getWebDir('floorplan') . '/front/image.php?file=' . urlencode($row['image_path'] ?? '');
+        $img_url  = fp_web_dir('floorplan') . '/front/image.php?file=' . urlencode($row['image_path'] ?? '');
 
         // Conta ativos no mapa
         $count = countElementsInTable('glpi_plugin_floorplan_items', [

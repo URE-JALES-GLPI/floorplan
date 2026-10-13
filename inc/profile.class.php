@@ -3,9 +3,11 @@ if (!defined('GLPI_ROOT')) {
     die("Sorry. You can't access this file directly");
 }
 
+require_once __DIR__ . '/compat.php';
+
 class PluginFloorplanProfile extends CommonDBTM
 {
-    public static $rightname = 'profile';
+    public static string $rightname = 'profile';
     public const RIGHT_FLOORPLAN = 'plugin_floorplan';
 
     // -------------------------------------------------------
@@ -297,7 +299,7 @@ class PluginFloorplanProfile extends CommonDBTM
                     <i class='ti ti-x'></i> Desmarcar todos
                   </button>";
             echo Html::hidden('profiles_id', ['value' => $profiles_id]);
-            echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]);
+            echo Html::hidden('_glpi_csrf_token', ['value' => fp_csrf_token()]);
             echo "<button type='submit' name='update' value='1' class='btn btn-primary'>
                     <i class='ti ti-device-floppy'></i> Salvar permissões
                   </button>";

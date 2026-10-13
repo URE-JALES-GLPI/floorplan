@@ -4,6 +4,7 @@
  */
 
 include('../../../inc/includes.php');
+require_once __DIR__ . '/../inc/compat.php';
 
 Session::checkRight('plugin_floorplan', READ);
 
@@ -18,7 +19,7 @@ if (isset($_POST['add'])) {
     Toolbox::logDebug('FloorPlan add result: ' . var_export($new_id, true));
     Toolbox::logDebug('FloorPlan POST: ' . var_export($_POST, true));
     if ($new_id) {
-        $url = Plugin::getWebDir('floorplan') . '/front/floorplan.form.php?id=' . (int)$new_id;
+        $url = fp_web_dir('floorplan') . '/front/floorplan.form.php?id=' . (int)$new_id;
         header('Location: ' . $url);
         exit;
     }
@@ -32,12 +33,12 @@ if (isset($_POST['add'])) {
 } elseif (isset($_POST['delete'])) {
     $fp->check($_POST['id'], DELETE, $_POST);
     $fp->delete($_POST);
-    Html::redirect(Plugin::getWebDir('floorplan') . '/front/floorplan.php');
+    Html::redirect(fp_web_dir('floorplan') . '/front/floorplan.php');
 
 } elseif (isset($_POST['purge'])) {
     $fp->check($_POST['id'], PURGE, $_POST);
     $fp->delete($_POST, true);
-    Html::redirect(Plugin::getWebDir('floorplan') . '/front/floorplan.php');
+    Html::redirect(fp_web_dir('floorplan') . '/front/floorplan.php');
 }
 
 // ---------- GET: exibir ----------
@@ -62,7 +63,7 @@ Html::header(
 
 $img_url = '';
 if (!empty($fp->fields['image_path'])) {
-    $img_url = Plugin::getWebDir('floorplan') . '/front/image.php?file=' . urlencode($fp->fields['image_path']);
+    $img_url = fp_web_dir('floorplan') . '/front/image.php?file=' . urlencode($fp->fields['image_path']);
 }
 
 ?>
@@ -84,7 +85,7 @@ if (!empty($fp->fields['image_path'])) {
             <input type="hidden" name="id" value="<?= $id ?>">
         <?php endif; ?>
         <?php echo Html::hidden('entities_id', ['value' => $entity_id]); ?>
-        <?php echo Html::hidden('_glpi_csrf_token', ['value' => Session::getNewCSRFToken()]); ?>
+        <?php echo Html::hidden('_glpi_csrf_token', ['value' => fp_csrf_token()]); ?>
 
         <div class="row g-4">
 
