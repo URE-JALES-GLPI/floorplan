@@ -37,7 +37,7 @@ Com essa abordagem, é possível visualizar rapidamente onde cada equipamento es
 
 ## 🖥️ Compatibilidade
 
-* GLPI 11.0.0 – 12.0.99
+* GLPI 12.0.0 – 12.0.99
 * PHP 8.x
 
 > A compatibilidade pode variar conforme a versão do GLPI utilizada.
